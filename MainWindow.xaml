@@ -1,0 +1,767 @@
+<Window x:Class="WatchSearchDocs.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WatchSearchDocs"
+        mc:Ignorable="d"
+        Title="Clasificador e Indexador de Documentos - WatchSearchDocs" 
+        Height="780" Width="1300"
+        MinHeight="600" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI"
+        Background="#F4F6F9">
+
+    <Window.Resources>
+        <!-- Estilo moderno para botones principales -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#0078D4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#106EBE"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#005A9E"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Botón verde para Indexar -->
+        <Style x:Key="IndexButton" TargetType="Button">
+            <Setter Property="Background" Value="#059669"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#047857"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#065F46"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Botón Demo (Índigo) -->
+        <Style x:Key="DemoButton" TargetType="Button">
+            <Setter Property="Background" Value="#4F46E5"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4338CA"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Botón secundario/outline -->
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#F3F4F6"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E5E7EB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Botón con destacado para subcarpetas -->
+        <Style x:Key="SubfolderBadgeButton" TargetType="Button">
+            <Setter Property="Background" Value="#EFF6FF"/>
+            <Setter Property="Foreground" Value="#1D4ED8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="12,7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#93C5FD"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#DBEAFE"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Estilo para inputs de texto -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="2,0"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Plantilla jerárquica para el TreeView del panel flotante de subcarpetas -->
+        <HierarchicalDataTemplate x:Key="FolderTreeTemplate" DataType="{x:Type local:FolderTreeNode}" ItemsSource="{Binding Subfolders}">
+            <Border Padding="4,2" Margin="0,1" CornerRadius="4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <CheckBox Grid.Column="0" 
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}" 
+                              VerticalAlignment="Center" 
+                              Margin="0,0,6,0"
+                              Cursor="Hand"
+                              Click="FolderCheckBox_Click"/>
+
+                    <TextBlock Grid.Column="1" Text="{Binding TypeLabel}" 
+                               FontSize="11" FontWeight="Bold" 
+                               Foreground="{Binding FolderColor}"
+                               VerticalAlignment="Center" Margin="0,0,6,0"/>
+
+                    <TextBlock Grid.Column="2" Text="{Binding Name}" 
+                               ToolTip="{Binding FullPath}" 
+                               FontSize="12"
+                               Foreground="{Binding FolderColor}"
+                               VerticalAlignment="Center" 
+                               TextTrimming="CharacterEllipsis"/>
+
+                    <Border Grid.Column="3" Background="#E2E8F0" CornerRadius="10" Padding="6,1" VerticalAlignment="Center" Margin="6,0,0,0">
+                        <TextBlock Text="{Binding FileCountDisplay}" 
+                                   Foreground="#475569" FontSize="10" FontWeight="SemiBold"/>
+                    </Border>
+                </Grid>
+            </Border>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Barra superior con selección de carpetas e indexación -->
+            <RowDefinition Height="Auto"/> <!-- Barra de búsqueda, filtros y opciones -->
+            <RowDefinition Height="Auto"/> <!-- Barra de progreso indeterminada secundaria -->
+            <RowDefinition Height="*"/>    <!-- Contenedor central (Vista de carpetas O Vista de indexación) -->
+            <RowDefinition Height="Auto"/> <!-- Barra de estado inferior -->
+        </Grid.RowDefinitions>
+
+        <!-- Cabecera Principal y Botones de Acción -->
+        <Border Grid.Row="0" Background="White" CornerRadius="10" Padding="16" Margin="0,0,0,14">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" Direction="-90" RenderingBias="Quality" ShadowDepth="2" Opacity="0.06"/>
+            </Border.Effect>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Seleccionar Carpetas" 
+                        Style="{StaticResource ModernButton}" 
+                        Click="BtnSelectFolders_Click" 
+                        ToolTip="Seleccionar una o múltiples carpetas a la vez"
+                        Margin="0,0,8,0"/>
+
+                <Button Grid.Column="1" Content="Agregar Carpeta" 
+                        Style="{StaticResource SecondaryButton}" 
+                        Click="BtnAddFolder_Click" 
+                        ToolTip="Agregar más carpetas a la lista actual"
+                        Margin="0,0,12,0"/>
+
+                <TextBox Grid.Column="2" x:Name="TxtFolderPath" 
+                         Style="{StaticResource ModernTextBox}" 
+                         IsReadOnly="True" 
+                         Background="#F9FAFB" 
+                         Foreground="#374151" 
+                         Text="Ninguna carpeta seleccionada" 
+                         ToolTip="Carpetas seleccionadas"/>
+
+                <!-- Botón General para Iniciar Indexación (Procesador PDF con PdfPig) -->
+                <Button Grid.Column="3" x:Name="BtnStartIndexing" 
+                        Content="Indexar Archivos" 
+                        Style="{StaticResource IndexButton}" 
+                        Margin="12,0,0,0"
+                        ToolTip="Iniciar indexación de prueba con PdfPig para los archivos PDF clasificados"
+                        Click="BtnStartIndexing_Click"/>
+
+                <!-- Botón Demo para abrir el Panel Demo Processor View -->
+                <Button Grid.Column="4" x:Name="BtnOpenDemoPanel" 
+                        Content="Panel Demo Processor" 
+                        Style="{StaticResource DemoButton}" 
+                        Margin="10,0,0,0"
+                        ToolTip="Abrir el panel demo para ver archivos indexados y su contenido captado"
+                        Click="BtnOpenDemoPanel_Click"/>
+
+                <!-- Botón para abrir el panel de subcarpetas -->
+                <Button Grid.Column="5" x:Name="BtnToggleSubfolders" 
+                        Content="Subcarpetas (0)" 
+                        Style="{StaticResource SubfolderBadgeButton}"
+                        Visibility="Collapsed"
+                        Margin="10,0,0,0"
+                        Click="BtnToggleSubfolders_Click"/>
+
+                <Button Grid.Column="6" Content="Recargar" 
+                        Style="{StaticResource SecondaryButton}" 
+                        Margin="10,0,0,0"
+                        Click="BtnReload_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- Barra de Búsqueda, Filtro de Clasificación y Controles -->
+        <Border Grid.Row="1" x:Name="FilterRowBar" Background="White" CornerRadius="10" Padding="14,10" Margin="0,0,0,14">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" Direction="-90" RenderingBias="Quality" ShadowDepth="2" Opacity="0.06"/>
+            </Border.Effect>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Buscar archivo:" 
+                           VerticalAlignment="Center" FontWeight="SemiBold" 
+                           Foreground="#4B5563" Margin="0,0,10,0"/>
+
+                <TextBox Grid.Column="1" x:Name="TxtFilter" 
+                         Style="{StaticResource ModernTextBox}" 
+                         ToolTip="Buscar por nombre, categoría, procesador o extensión"
+                         TextChanged="TxtFilter_TextChanged"/>
+
+                <!-- Indicador visual del Clasificador Activo -->
+                <Border Grid.Column="2" Background="#F0FDF4" BorderBrush="#BBF7D0" BorderThickness="1" CornerRadius="6" Padding="8,4" Margin="14,0,0,0">
+                    <TextBlock Text="Clasificador Activo: Solo PDF, DOCX, XLSX, JPG, PNG, PPT, TXT" 
+                               FontSize="11" FontWeight="SemiBold" Foreground="#166534" 
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <!-- Casilla para mostrar archivos ocultos compatibles -->
+                <CheckBox Grid.Column="3" x:Name="ChkShowHidden" 
+                          Content="Mostrar archivos ocultos" 
+                          VerticalAlignment="Center" 
+                          Foreground="#4B5563" 
+                          FontWeight="Medium"
+                          Margin="14,0,0,0"
+                          Cursor="Hand"
+                          Checked="ChkShowHidden_Changed" 
+                          Unchecked="ChkShowHidden_Changed"/>
+
+                <Button Grid.Column="4" Content="Expandir Todo" 
+                        Style="{StaticResource SecondaryButton}" 
+                        Padding="8,4" FontSize="11" Margin="14,0,4,0"
+                        Click="BtnExpandAll_Click"/>
+
+                <Button Grid.Column="5" Content="Colapsar Todo" 
+                        Style="{StaticResource SecondaryButton}" 
+                        Padding="8,4" FontSize="11" Margin="0,0,14,0"
+                        Click="BtnCollapseAll_Click"/>
+
+                <TextBlock Grid.Column="6" x:Name="TxtCount" 
+                           Text="0 archivos indexables" 
+                           VerticalAlignment="Center" FontWeight="SemiBold" 
+                           Foreground="#1E293B"/>
+            </Grid>
+        </Border>
+
+        <!-- Barra de Progreso Indeterminada para escaneos -->
+        <ProgressBar Grid.Row="2" x:Name="PbLoading" Height="4" 
+                     IsIndeterminate="True" 
+                     Visibility="Collapsed" 
+                     Foreground="#0078D4"
+                     Margin="0,0,0,10"/>
+
+        <!-- CONTENEDOR CENTRAL: VISTA NORMAL DE CARPETAS DESPLEGABLES -->
+        <Border Grid.Row="3" x:Name="FolderMainView" Background="White" CornerRadius="10" Padding="12" Visibility="Visible">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" Direction="-90" RenderingBias="Quality" ShadowDepth="2" Opacity="0.06"/>
+            </Border.Effect>
+            <Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl x:Name="IcRootFolders">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <local:FolderGroupView Margin="0,0,0,10"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <TextBlock x:Name="TxtEmptyNotice" 
+                           Text="Selecciona una o más carpetas para clasificar y ver archivos indexables." 
+                           Foreground="#9CA3AF" FontSize="14" 
+                           HorizontalAlignment="Center" VerticalAlignment="Center" 
+                           IsHitTestVisible="False"/>
+            </Grid>
+        </Border>
+
+        <!-- PANTALLA COMPLETA DE PROCESO DE INDEXACIÓN EN TIEMPO REAL -->
+        <Border Grid.Row="1" Grid.RowSpan="3" x:Name="IndexingProgressView" 
+                Background="White" CornerRadius="12" Padding="32" 
+                Visibility="Collapsed" Panel.ZIndex="50">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" Direction="-90" ShadowDepth="4" Opacity="0.12"/>
+            </Border.Effect>
+            <Grid VerticalAlignment="Center" MaxWidth="800">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Encabezado de la pantalla de indexación -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,24" HorizontalAlignment="Center">
+                    <TextBlock Text="Proceso de Indexación de Documentos (PdfPig)" 
+                               FontSize="22" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Extrayendo texto y metadatos en tiempo real con cálculo de velocidad..." 
+                               FontSize="13" Foreground="#64748B" Margin="0,4,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Barra de Progreso y Porcentaje en Tiempo Real -->
+                <Grid Grid.Row="1" Margin="0,0,0,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ProgressBar Grid.Row="0" x:Name="PbIndexing" Height="14" 
+                                 Minimum="0" Maximum="100" Value="0" 
+                                 Foreground="#059669" Background="#E2E8F0"/>
+                    <TextBlock Grid.Row="1" x:Name="TxtProgressPercent" Text="0%" 
+                               FontWeight="Bold" FontSize="14" Foreground="#059669" 
+                               HorizontalAlignment="Right" Margin="0,4,0,0"/>
+                </Grid>
+
+                <!-- Archivo actual siendo procesado -->
+                <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="8" Padding="14,10" Margin="0,0,0,24" BorderBrush="#E2E8F0" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Archivo en proceso:" FontSize="11" FontWeight="SemiBold" Foreground="#64748B"/>
+                        <TextBlock x:Name="TxtCurrentProcessingFile" Text="Iniciando motor de lectura..." 
+                                   FontSize="13" FontWeight="SemiBold" Foreground="#1E293B" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 4 Tarjetas de Métricas en Tiempo Real (Tiempo, Velocidad, Conteo, Restante) -->
+                <Grid Grid.Row="3" Margin="0,0,0,28">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Tarjeta 1: Archivos Procesados -->
+                    <Border Grid.Column="0" Background="#F1F5F9" CornerRadius="8" Padding="14,10" Margin="0,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="Progreso" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="TxtMetricProcessedCount" Text="0 / 0" FontSize="16" FontWeight="Bold" Foreground="#1E293B" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tarjeta 2: Tiempo Transcurrido -->
+                    <Border Grid.Column="1" Background="#F1F5F9" CornerRadius="8" Padding="14,10" Margin="6,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="Tiempo Transcurrido" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="TxtMetricElapsedTime" Text="00:00:00" FontSize="16" FontWeight="Bold" Foreground="#0078D4" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tarjeta 3: Velocidad (archivos/segundo calculados) -->
+                    <Border Grid.Column="2" Background="#F1F5F9" CornerRadius="8" Padding="14,10" Margin="6,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="Velocidad (arch/seg)" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="TxtMetricSpeed" Text="0.0 arch/s" FontSize="16" FontWeight="Bold" Foreground="#059669" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tarjeta 4: Tiempo Estimado Restante -->
+                    <Border Grid.Column="3" Background="#F1F5F9" CornerRadius="8" Padding="14,10" Margin="6,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Tiempo Restante" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="TxtMetricEstimatedRemaining" Text="Calculando..." FontSize="16" FontWeight="Bold" Foreground="#D97706" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Mensaje de estado final y botón de cancelación -->
+                <TextBlock Grid.Row="4" x:Name="TxtIndexingResultSummary" Text="" 
+                           FontSize="13" FontWeight="SemiBold" Foreground="#166534" 
+                           HorizontalAlignment="Center" Margin="0,0,0,16" Visibility="Collapsed"/>
+
+                <Button Grid.Row="5" x:Name="BtnCancelIndexing" Content="Cancelar Indexación" 
+                        Style="{StaticResource SecondaryButton}" 
+                        HorizontalAlignment="Center" Padding="20,8"
+                        Click="BtnCancelIndexing_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- PANEL FLOTANTE 1: PANEL DEMO PROCESSOR VIEW (Muestra archivos indexados) -->
+        <Border x:Name="FloatingDemoPanel"
+                Grid.Row="1" Grid.RowSpan="3"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                Width="500" MaxHeight="600"
+                Margin="0,0,16,0"
+                Background="White" CornerRadius="12"
+                BorderBrush="#CBD5E1" BorderThickness="1"
+                Visibility="Collapsed"
+                Panel.ZIndex="90">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24" Direction="-90" ShadowDepth="6" Opacity="0.22"/>
+            </Border.Effect>
+
+            <Grid Margin="18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Cabecera del Panel Demo -->
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Panel Demo Processor View" FontWeight="Bold" FontSize="16" Foreground="#1E293B"/>
+                        <TextBlock Text="Archivos indexados disponibles. Haz clic en uno para ver su contenido:" FontSize="12" Foreground="#64748B" Margin="0,2,0,0"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Content="Cerrar" 
+                            Style="{StaticResource SecondaryButton}" 
+                            Padding="8,3" FontSize="11"
+                            Click="BtnCloseDemoPanel_Click"/>
+                </Grid>
+
+                <!-- Resumen de estadísticas del Demo -->
+                <Border Grid.Row="1" Background="#F8FAFC" CornerRadius="8" Padding="12,8" Margin="0,0,0,12" BorderBrush="#E2E8F0" BorderThickness="1">
+                    <TextBlock x:Name="TxtDemoStatsSummary" 
+                               Text="0 archivos indexados disponibles para consulta" 
+                               FontSize="12" FontWeight="SemiBold" Foreground="#475569"/>
+                </Border>
+
+                <!-- Lista de Archivos Indexados -->
+                <Border Grid.Row="2" Background="#FAFAFA" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="4">
+                    <ListBox x:Name="LbIndexedDocuments" 
+                             BorderThickness="0" Background="Transparent"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             SelectionChanged="LbIndexedDocuments_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="White" CornerRadius="6" Padding="10,8" Margin="0,2" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#F0FDF4"/>
+                                                    <Setter Property="BorderBrush" Value="#86EFAC"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Nombre del archivo -->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding FileName}" 
+                                                   FontWeight="SemiBold" FontSize="13" Foreground="#0F172A" TextTrimming="CharacterEllipsis"/>
+
+                                        <!-- Estado del procesador -->
+                                        <Border Grid.Row="0" Grid.Column="1" Background="#DCFCE7" CornerRadius="4" Padding="6,1">
+                                            <TextBlock Text="Completado" FontSize="10" FontWeight="Bold" Foreground="#15803D"/>
+                                        </Border>
+
+                                        <!-- Métricas: Nivel de extracción, Páginas, imágenes, caracteres, tiempo -->
+                                        <WrapPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,4,0,0">
+                                            <Border Background="#F1F5F9" CornerRadius="4" Padding="6,1" Margin="0,0,8,2">
+                                                <TextBlock Text="{Binding ExtractionLevel}" FontSize="10" FontWeight="SemiBold" Foreground="#334155"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding PageCount, StringFormat='{}{0} págs.'}" FontSize="11" Foreground="#64748B" Margin="0,0,8,2" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding TotalImagesFound, StringFormat='{}{0} img.'}" FontSize="11" Foreground="#64748B" Margin="0,0,8,2" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding TotalCharacters, StringFormat='{}{0:N0} caracteres'}" FontSize="11" Foreground="#64748B" Margin="0,0,8,2" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding ProcessingTimeMs, StringFormat='{}{0:N0} ms'}" FontSize="11" Foreground="#0284C7" FontWeight="Medium" Margin="0,0,4,2" VerticalAlignment="Center"/>
+                                        </WrapPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+
+                <!-- Pie del panel flotante demo -->
+                <Grid Grid.Row="3" Margin="0,12,0,0">
+                    <TextBlock Text="Haz clic en cualquier documento para abrir el visor de contenido captado" 
+                               FontSize="11" Foreground="#94A3B8" FontStyle="Italic" VerticalAlignment="Center"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- PANEL FLOTANTE 2: VISOR DE CONTENIDO CAPTADO TAL COMO LO EXTRAJO PDFPIG -->
+        <Border x:Name="FloatingContentDetailPanel"
+                Grid.Row="1" Grid.RowSpan="3"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Width="750" MaxHeight="640"
+                Background="White" CornerRadius="12"
+                BorderBrush="#CBD5E1" BorderThickness="1"
+                Visibility="Collapsed"
+                Panel.ZIndex="100">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="30" Direction="-90" ShadowDepth="8" Opacity="0.25"/>
+            </Border.Effect>
+
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Cabecera del visor de contenido -->
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock x:Name="TxtDetailDocTitle" Text="Contenido Captado por el Procesador" FontWeight="Bold" FontSize="16" Foreground="#1E293B"/>
+                        <TextBlock x:Name="TxtDetailDocPath" Text="Ruta del archivo" FontSize="11" Foreground="#64748B" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Content="Cerrar Visor" 
+                            Style="{StaticResource SecondaryButton}" 
+                            Padding="10,4" FontSize="11"
+                            Click="BtnCloseDetailPanel_Click"/>
+                </Grid>
+
+                <!-- Barra de Metadatos del Documento Captado -->
+                <Border Grid.Row="1" Background="#F1F5F9" CornerRadius="6" Padding="12,6" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="TxtDetailDocStats" 
+                                   Text="Páginas: 0 | Palabras: 0 | Caracteres: 0 | Tiempo: 0 ms" 
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#334155" VerticalAlignment="Center"/>
+
+                        <!-- Selector de página para filtrar lectura -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock Text="Filtrar página:" FontSize="11" Foreground="#475569" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <ComboBox x:Name="CmbPageFilter" Width="130" FontSize="11" SelectionChanged="CmbPageFilter_SelectionChanged"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Caja de texto con el contenido extraído tal como lo captó PdfPig -->
+                <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="6" BorderBrush="#CBD5E1" BorderThickness="1">
+                    <TextBox x:Name="TxtExtractedContent" 
+                             IsReadOnly="True" 
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto" 
+                             HorizontalScrollBarVisibility="Auto" 
+                             FontFamily="Consolas, Segoe UI" 
+                             FontSize="12" 
+                             Background="Transparent" 
+                             BorderThickness="0" 
+                             Padding="12"/>
+                </Border>
+
+                <!-- Pie del visor con botón de acción -->
+                <Grid Grid.Row="3" Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Texto puro sin alterar extraído mediante UglyToad.PdfPig" 
+                               FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1" Content="Volver al Panel Demo" 
+                            Style="{StaticResource ModernButton}" 
+                            Padding="14,6" FontSize="11"
+                            Click="BtnCloseDetailPanel_Click"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- PANEL FLOTANTE DE SUBCARPETAS (YA EXISTENTE) -->
+        <Border x:Name="FloatingSubfoldersPanel"
+                Grid.Row="1" Grid.RowSpan="3"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                Width="460" MaxHeight="560"
+                Margin="0,0,16,0"
+                Background="White" CornerRadius="12"
+                BorderBrush="#CBD5E1" BorderThickness="1"
+                Visibility="Collapsed"
+                Panel.ZIndex="80">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24" Direction="-90" ShadowDepth="6" Opacity="0.22"/>
+            </Border.Effect>
+
+            <Grid Margin="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Filtrar por Carpetas y Subcarpetas" FontWeight="Bold" FontSize="15" Foreground="#1E293B"/>
+                        <TextBlock Text="Despliega las ramas para marcar carpetas a procesar:" FontSize="12" Foreground="#64748B" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Cerrar" Style="{StaticResource SecondaryButton}" Padding="8,3" FontSize="11" Click="BtnCloseFloatingPanel_Click"/>
+                </Grid>
+
+                <Border Grid.Row="1" Background="#F8FAFC" CornerRadius="8" Padding="10,8" Margin="0,0,0,10" BorderBrush="#E2E8F0" BorderThickness="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0" x:Name="ChkSelectAll" Content="Seleccionar todas las carpetas" FontWeight="SemiBold" Foreground="#1E293B" VerticalAlignment="Center" Cursor="Hand" Click="ChkSelectAll_Click"/>
+                        <Button Grid.Column="1" Content="Todas" FontSize="11" Padding="6,2" Margin="6,0,4,0" Style="{StaticResource SecondaryButton}" Click="BtnSelectAllFolders_Click"/>
+                        <Button Grid.Column="2" Content="Ninguna" FontSize="11" Padding="6,2" Style="{StaticResource SecondaryButton}" Click="BtnDeselectAllFolders_Click"/>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="2" Background="#FAFAFA" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="4">
+                    <TreeView x:Name="TvSubfolders" BorderThickness="0" Background="Transparent" ItemTemplate="{StaticResource FolderTreeTemplate}">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                <Setter Property="Padding" Value="2,2"/>
+                                <Setter Property="Margin" Value="0,1"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                    </TreeView>
+                </Border>
+
+                <Grid Grid.Row="3" Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" x:Name="TxtSubfoldersSummary" Text="0 de 0 carpetas seleccionadas" FontSize="11" Foreground="#64748B" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Content="Continuar" Style="{StaticResource ModernButton}" Padding="16,6" FontSize="12" Click="BtnApplyFolders_Click"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Barra de Estado Inferior -->
+        <StatusBar Grid.Row="4" Background="Transparent" Margin="4,8,4,0">
+            <StatusBarItem>
+                <TextBlock x:Name="TxtStatus" Text="Listo para clasificar e indexar." Foreground="#6B7280" FontSize="12"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="Procesador PDF activo mediante UglyToad.PdfPig" Foreground="#64748B" FontSize="11"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

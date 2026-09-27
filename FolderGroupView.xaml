@@ -1,0 +1,137 @@
+<UserControl x:Class="WatchSearchDocs.FolderGroupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WatchSearchDocs"
+             mc:Ignorable="d" 
+             d:DesignWidth="900">
+
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+
+    <Border Background="White" CornerRadius="8" Margin="0,4,0,6" Padding="4"
+            BorderBrush="#E2E8F0" BorderThickness="1">
+        <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Margin="2">
+            <Expander.Header>
+                <Grid Margin="4,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Distintivo Tipo: [Raíz], [Subcarpeta], [Restringido] sin emojis -->
+                    <Border Grid.Column="0" Background="#F1F5F9" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                        <TextBlock Text="{Binding TypeLabel}" 
+                                   FontWeight="Bold" FontSize="11" 
+                                   Foreground="{Binding FolderColor}"/>
+                    </Border>
+
+                    <!-- Nombre de la carpeta -->
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" 
+                               FontWeight="SemiBold" FontSize="13" 
+                               Foreground="{Binding FolderColor}"
+                               VerticalAlignment="Center" Margin="0,0,10,0"/>
+
+                    <!-- Ruta relativa informativa -->
+                    <TextBlock Grid.Column="2" Text="{Binding RelativePath, StringFormat='({0})'}" 
+                               FontSize="11" Foreground="#94A3B8" 
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+
+                    <!-- Conteo de archivos indexables -->
+                    <Border Grid.Column="3" Background="#F8FAFC" CornerRadius="10" Padding="8,2" BorderBrush="#E2E8F0" BorderThickness="1" Margin="6,0,4,0">
+                        <TextBlock Text="{Binding FileCountDisplay}" 
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#475569"/>
+                    </Border>
+                </Grid>
+            </Expander.Header>
+
+            <StackPanel Margin="16,6,8,8">
+                <!-- Tabla de archivos clasificados directos de esta carpeta -->
+                <ListView ItemsSource="{Binding FilteredFiles}" 
+                          BorderThickness="0" 
+                          Background="Transparent"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          MouseDoubleClick="LvFiles_MouseDoubleClick">
+                    <ListView.Style>
+                        <Style TargetType="ListView">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasDirectFiles}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.Style>
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Opacity" Value="{Binding RowOpacity}"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="4,3"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Tipo" Width="55" DisplayMemberBinding="{Binding Extension}"/>
+                            <GridViewColumn Header="Nombre del Archivo" Width="200" DisplayMemberBinding="{Binding Name}"/>
+                            
+                            <!-- Columnas con información provista por el clasificador -->
+                            <GridViewColumn Header="Categoría" Width="140" DisplayMemberBinding="{Binding CategoryName}"/>
+                            <GridViewColumn Header="Procesador Asignado" Width="130" DisplayMemberBinding="{Binding ProcessorTarget}"/>
+                            
+                            <!-- Columnas de ubicación de carpeta -->
+                            <GridViewColumn Header="Carpeta" Width="130" DisplayMemberBinding="{Binding FolderName}"/>
+                            <GridViewColumn Header="Tipo de Carpeta" Width="100" DisplayMemberBinding="{Binding FolderType}"/>
+                            
+                            <GridViewColumn Header="Tamaño" Width="85" DisplayMemberBinding="{Binding SizeFormatted}"/>
+                            <GridViewColumn Header="Última Modificación" Width="135" DisplayMemberBinding="{Binding LastModifiedFormatted}"/>
+
+                            <GridViewColumn Header="Estado" Width="90">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding StatusText}" 
+                                                   Foreground="{Binding StatusColor}" 
+                                                   FontWeight="SemiBold"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+
+                            <GridViewColumn Header="Ruta Completa" Width="260" DisplayMemberBinding="{Binding FullPath}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <!-- Sub-desplegables recursivos para las subcarpetas -->
+                <ItemsControl ItemsSource="{Binding Subfolders}" Margin="0,4,0,0">
+                    <ItemsControl.Style>
+                        <Style TargetType="ItemsControl">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasSubfolders}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Style>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:FolderGroupView Margin="0,2,0,4"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Expander>
+    </Border>
+</UserControl>
