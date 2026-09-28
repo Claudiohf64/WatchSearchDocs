@@ -67,28 +67,17 @@ public static class OcrService
     }
 
     /// <summary>
-    /// Extrae texto de un arreglo de bytes de imagen (PNG, JPG, BMP, TIFF) mediante Windows.Media.Ocr.
+    /// Reconoce texto directamente desde un flujo IRandomAccessStream (renderizado de página PDF o imagen).
     /// </summary>
-    public static async Task<string> RecognizeImageBytesAsync(byte[] imageBytes)
+    public static async Task<string> RecognizeStreamAsync(IRandomAccessStream stream)
     {
-        if (imageBytes == null || imageBytes.Length == 0)
-            return string.Empty;
-
         var engine = GetEngine();
         if (engine == null)
             return string.Empty;
 
         try
         {
-            using var stream = new InMemoryRandomAccessStream();
-            using (var writer = new DataWriter(stream.GetOutputStreamAt(0)))
-            {
-                writer.WriteBytes(imageBytes);
-                await writer.StoreAsync();
-                await writer.FlushAsync();
-                writer.DetachStream();
-            }
-
+            stream.Seek(0);
             var decoder = await BitmapDecoder.CreateAsync(stream);
 
             var transform = new BitmapTransform();
@@ -109,6 +98,33 @@ public static class OcrService
 
             var result = await engine.RecognizeAsync(softwareBitmap);
             return result?.Text?.Trim() ?? string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Extrae texto de un arreglo de bytes de imagen (PNG, JPG, BMP, TIFF) mediante Windows.Media.Ocr.
+    /// </summary>
+    public static async Task<string> RecognizeImageBytesAsync(byte[] imageBytes)
+    {
+        if (imageBytes == null || imageBytes.Length == 0)
+            return string.Empty;
+
+        try
+        {
+            using var stream = new InMemoryRandomAccessStream();
+            using (var writer = new DataWriter(stream.GetOutputStreamAt(0)))
+            {
+                writer.WriteBytes(imageBytes);
+                await writer.StoreAsync();
+                await writer.FlushAsync();
+                writer.DetachStream();
+            }
+
+            return await RecognizeStreamAsync(stream);
         }
         catch
         {

@@ -476,10 +476,18 @@
                            FontSize="13" FontWeight="SemiBold" Foreground="#166534" 
                            HorizontalAlignment="Center" Margin="0,0,0,16" Visibility="Collapsed"/>
 
-                <Button Grid.Row="5" x:Name="BtnCancelIndexing" Content="Cancelar Indexación" 
-                        Style="{StaticResource SecondaryButton}" 
-                        HorizontalAlignment="Center" Padding="20,8"
-                        Click="BtnCancelIndexing_Click"/>
+                <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="BtnCancelIndexing" Content="Cancelar Indexación" 
+                            Style="{StaticResource SecondaryButton}" 
+                            HorizontalAlignment="Center" Padding="20,8"
+                            Click="BtnCancelIndexing_Click"/>
+
+                    <Button x:Name="BtnContinueIndexing" Content="Continuar" 
+                            Style="{StaticResource PrimaryButton}" 
+                            HorizontalAlignment="Center" Padding="32,9"
+                            Visibility="Collapsed"
+                            Click="BtnContinueIndexing_Click"/>
+                </StackPanel>
             </Grid>
         </Border>
 

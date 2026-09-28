@@ -169,6 +169,9 @@ public partial class MainWindow : Window
         FloatingContentDetailPanel.Visibility = Visibility.Collapsed;
         IndexingProgressView.Visibility = Visibility.Visible;
         TxtIndexingResultSummary.Visibility = Visibility.Collapsed;
+        BtnCancelIndexing.Visibility = Visibility.Visible;
+        BtnCancelIndexing.IsEnabled = true;
+        BtnContinueIndexing.Visibility = Visibility.Collapsed;
 
         _indexingCts = new CancellationTokenSource();
         var cancellationToken = _indexingCts.Token;
@@ -230,33 +233,39 @@ public partial class MainWindow : Window
             double finalElapsedSec = stopwatch.Elapsed.TotalSeconds;
             double finalSpeed = finalElapsedSec > 0 ? (double)processedCount / finalElapsedSec : processedCount;
 
+            TxtCurrentProcessingFile.Text = "Proceso finalizado. Haz clic en 'Continuar' para regresar a la vista de carpetas.";
             TxtIndexingResultSummary.Visibility = Visibility.Visible;
             TxtIndexingResultSummary.Text = $"Indexación completada: {successCount} de {totalFiles} PDFs procesados en {stopwatch.Elapsed.TotalSeconds:F2} seg (Promedio: {finalSpeed:F1} arch/s).";
-
-            // Breve pausa para visualizar el 100% de la barra
-            await Task.Delay(1400);
         }
         catch (OperationCanceledException)
         {
+            TxtCurrentProcessingFile.Text = "Indexación cancelada.";
             TxtIndexingResultSummary.Visibility = Visibility.Visible;
-            TxtIndexingResultSummary.Text = "Indexación cancelada por el usuario.";
-            await Task.Delay(1000);
+            TxtIndexingResultSummary.Text = $"Indexación cancelada por el usuario ({processedCount} de {totalFiles} procesados).";
         }
         finally
         {
-            // 3. Volver a la pantalla de carpetas anterior indicando qué archivos fueron procesados
-            IndexingProgressView.Visibility = Visibility.Collapsed;
-            FolderMainView.Visibility = Visibility.Visible;
-            FilterRowBar.Visibility = Visibility.Visible;
-
-            ApplyFilter();
-            TxtStatus.Text = $"Indexación de prueba lista: {_indexedResults.Count} PDF(s) procesados. Haz clic en 'Panel Demo Processor' para consultar el texto captado.";
+            // Mostrar botón de continuar para que el usuario decida cuándo salir
+            BtnCancelIndexing.Visibility = Visibility.Collapsed;
+            BtnContinueIndexing.Visibility = Visibility.Visible;
         }
     }
 
     private void BtnCancelIndexing_Click(object sender, RoutedEventArgs e)
     {
+        BtnCancelIndexing.IsEnabled = false;
         _indexingCts?.Cancel();
+    }
+
+    private void BtnContinueIndexing_Click(object sender, RoutedEventArgs e)
+    {
+        // Volver a la pantalla de carpetas indicando qué archivos fueron procesados
+        IndexingProgressView.Visibility = Visibility.Collapsed;
+        FolderMainView.Visibility = Visibility.Visible;
+        FilterRowBar.Visibility = Visibility.Visible;
+
+        ApplyFilter();
+        TxtStatus.Text = $"Indexación lista: {_indexedResults.Count} PDF(s) procesados. Haz clic en 'Panel Demo Processor' para consultar el texto captado.";
     }
 
     #endregion
