@@ -9,10 +9,6 @@ using Windows.Storage.Streams;
 
 namespace WatchSearchDocs;
 
-/// <summary>
-/// Servicio de OCR de alto rendimiento basado en Windows.Media.Ocr nativo del sistema operativo.
-/// Cero dependencias externas y optimizado con aceleración de hardware.
-/// </summary>
 public static class OcrService
 {
     private static OcrEngine? _ocrEngine;
@@ -30,10 +26,8 @@ public static class OcrService
             if (_ocrEngine != null) 
                 return _ocrEngine;
 
-            // 1. Intentar el idioma de perfil del usuario en Windows
             var engine = OcrEngine.TryCreateFromUserProfileLanguages();
 
-            // 2. Si no, intentar español ("es")
             if (engine == null)
             {
                 var spanishLang = OcrEngine.AvailableRecognizerLanguages
@@ -44,7 +38,6 @@ public static class OcrService
                 }
             }
 
-            // 3. Si no, intentar inglés ("en")
             if (engine == null)
             {
                 var englishLang = OcrEngine.AvailableRecognizerLanguages
@@ -55,7 +48,6 @@ public static class OcrService
                 }
             }
 
-            // 4. Fallback al primer idioma disponible en el sistema
             if (engine == null && OcrEngine.AvailableRecognizerLanguages.Count > 0)
             {
                 engine = OcrEngine.TryCreateFromLanguage(OcrEngine.AvailableRecognizerLanguages[0]);
@@ -66,9 +58,6 @@ public static class OcrService
         }
     }
 
-    /// <summary>
-    /// Reconoce texto directamente desde un flujo IRandomAccessStream (renderizado de página PDF o imagen).
-    /// </summary>
     public static async Task<string> RecognizeStreamAsync(IRandomAccessStream stream)
     {
         var engine = GetEngine();
@@ -105,9 +94,6 @@ public static class OcrService
         }
     }
 
-    /// <summary>
-    /// Extrae texto de un arreglo de bytes de imagen (PNG, JPG, BMP, TIFF) mediante Windows.Media.Ocr.
-    /// </summary>
     public static async Task<string> RecognizeImageBytesAsync(byte[] imageBytes)
     {
         if (imageBytes == null || imageBytes.Length == 0)
@@ -132,9 +118,6 @@ public static class OcrService
         }
     }
 
-    /// <summary>
-    /// Extrae texto de un archivo de imagen en disco (.jpg, .png, etc.).
-    /// </summary>
     public static async Task<string> RecognizeFileAsync(string filePath)
     {
         if (!File.Exists(filePath))

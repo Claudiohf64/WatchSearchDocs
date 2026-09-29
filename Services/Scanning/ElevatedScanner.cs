@@ -6,7 +6,6 @@ namespace WatchSearchDocs;
 
 public static class ElevatedScanner
 {
-    // Nombres de directorios de desarrollo, temporales o del sistema que no contienen documentos de usuario
     public static readonly HashSet<string> IgnoredDirectoryNames = new(StringComparer.OrdinalIgnoreCase)
     {
         ".git", ".vs", ".vscode", ".idea",
@@ -55,7 +54,6 @@ public static class ElevatedScanner
             if (IsIgnoredDirectoryPath(file.FullName))
                 continue;
 
-            // Pasar por el clasificador de indexación
             var classification = DocumentClassifier.Classify(file.FullName, file.Extension);
             if (!classification.IsIndexable)
                 continue;
@@ -64,7 +62,7 @@ public static class ElevatedScanner
             bool isRoot = string.IsNullOrEmpty(relDir) || relDir == ".";
             if (isRoot)
             {
-                relDir = "(raíz)";
+                relDir = "Raíz";
             }
 
             string folderName = file.Directory?.Name ?? Path.GetFileName(rootFolder);
@@ -85,6 +83,7 @@ public static class ElevatedScanner
                 LastModified = file.LastWriteTime,
                 LastModifiedFormatted = file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
                 FullPath = file.FullName,
+                RootPath = rootFolder,
                 IsHidden = isHidden,
                 IsLocked = isLocked,
                 IsIndexable = classification.IsIndexable,

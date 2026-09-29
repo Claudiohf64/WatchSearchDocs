@@ -7,11 +7,7 @@ using Microsoft.Data.Sqlite;
 
 namespace WatchSearchDocs;
 
-/// <summary>
-/// Servicio de persistencia y búsqueda indexada en SQLite con soporte para FTS5.
-/// Administra las tablas IndexRoots, Documents y la tabla virtual DocumentsFTS.
-/// </summary>
-public class DocumentIndexService
+public class DocumentIndexService : IIndexService
 {
     private static readonly Lazy<DocumentIndexService> _instance = new(() => new DocumentIndexService());
     public static DocumentIndexService Instance => _instance.Value;
@@ -33,9 +29,6 @@ public class DocumentIndexService
         }.ToString();
     }
 
-    /// <summary>
-    /// Normaliza una ruta a minúsculas y sin separadores finales para garantizar unicidad.
-    /// </summary>
     public static string NormalizePathKey(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -44,10 +37,6 @@ public class DocumentIndexService
         return Path.GetFullPath(path).TrimEnd('\\', '/').ToLowerInvariant();
     }
 
-    /// <summary>
-    /// Inicializa la base de datos creando las tablas IndexRoots, Documents,
-    /// la tabla virtual DocumentsFTS (FTS5) y los disparadores automáticos de sincronización.
-    /// </summary>
     public async Task EnsureDatabaseCreatedAsync()
     {
         if (_isInitialized) return;
@@ -66,7 +55,6 @@ public class DocumentIndexService
             await using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
-            // Optimización de rendimiento SQLite
             await using (var pragmaCmd = connection.CreateCommand())
             {
                 pragmaCmd.CommandText = @"
@@ -77,11 +65,9 @@ public class DocumentIndexService
                 await pragmaCmd.ExecuteNonQueryAsync();
             }
 
-            // Creación de tablas estructuradas
             await using (var createCmd = connection.CreateCommand())
             {
                 createCmd.CommandText = @"
-                    -- 1. Tabla de Carpetas Raíz
                     CREATE TABLE IF NOT EXISTS IndexRoots (
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         RootPath TEXT NOT NULL,
@@ -90,7 +76,6 @@ public class DocumentIndexService
                         AddedAtUtc TEXT NOT NULL
                     );
 
-                    -- 2. Tabla Principal de Documentos
                     CREATE TABLE IF NOT EXISTS Documents (
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         RootId INTEGER NOT NULL,
@@ -117,7 +102,6 @@ public class DocumentIndexService
                     CREATE INDEX IF NOT EXISTS idx_documents_status ON Documents(ProcessingStatus);
                     CREATE INDEX IF NOT EXISTS idx_documents_pathkey ON Documents(PathKey);
 
-                    -- 3. Tabla Virtual FTS5 para Búsqueda Textual Rápida
                     CREATE VIRTUAL TABLE IF NOT EXISTS DocumentsFTS USING fts5(
                         FileName,
                         Content,
@@ -126,17 +110,14 @@ public class DocumentIndexService
                         tokenize='unicode61 remove_diacritics 2'
                     );
 
-                    -- Disparador: Sincronizar inserciones hacia DocumentsFTS
                     CREATE TRIGGER IF NOT EXISTS trg_documents_ai AFTER INSERT ON Documents BEGIN
                         INSERT INTO DocumentsFTS(rowid, FileName, Content) VALUES (new.Id, new.FileName, new.Content);
                     END;
 
-                    -- Disparador: Sincronizar eliminaciones hacia DocumentsFTS
                     CREATE TRIGGER IF NOT EXISTS trg_documents_ad AFTER DELETE ON Documents BEGIN
                         INSERT INTO DocumentsFTS(DocumentsFTS, rowid, FileName, Content) VALUES ('delete', old.Id, old.FileName, old.Content);
                     END;
 
-                    -- Disparador: Sincronizar actualizaciones hacia DocumentsFTS
                     CREATE TRIGGER IF NOT EXISTS trg_documents_au AFTER UPDATE ON Documents BEGIN
                         INSERT INTO DocumentsFTS(DocumentsFTS, rowid, FileName, Content) VALUES ('delete', old.Id, old.FileName, old.Content);
                         INSERT INTO DocumentsFTS(rowid, FileName, Content) VALUES (new.Id, new.FileName, new.Content);
@@ -153,9 +134,6 @@ public class DocumentIndexService
         }
     }
 
-    /// <summary>
-    /// Obtiene o registra una carpeta raíz en IndexRoots y retorna su Id.
-    /// </summary>
     public async Task<long> GetOrCreateRootAsync(string rootPath)
     {
         await EnsureDatabaseCreatedAsync();
@@ -169,7 +147,6 @@ public class DocumentIndexService
             await using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
-            // Buscar si ya existe
             await using (var selectCmd = connection.CreateCommand())
             {
                 selectCmd.CommandText = "SELECT Id FROM IndexRoots WHERE PathKey = @PathKey LIMIT 1;";
@@ -181,7 +158,6 @@ public class DocumentIndexService
                 }
             }
 
-            // Insertar nueva raíz
             await using (var insertCmd = connection.CreateCommand())
             {
                 insertCmd.CommandText = @"
@@ -203,9 +179,6 @@ public class DocumentIndexService
         }
     }
 
-    /// <summary>
-    /// Guarda o actualiza un documento en la tabla Documents. FTS5 se actualiza automáticamente por disparadores.
-    /// </summary>
     public async Task<long> SaveOrUpdateDocumentAsync(DocumentRecord doc)
     {
         await EnsureDatabaseCreatedAsync();
@@ -285,9 +258,6 @@ public class DocumentIndexService
         }
     }
 
-    /// <summary>
-    /// Toma el resultado procesado de un archivo y lo persiste directamente en SQLite.
-    /// </summary>
     public async Task<long> IndexProcessedResultAsync(FileItem file, ProcessedDocumentResult result)
     {
         string rootPath = !string.IsNullOrWhiteSpace(file.RootPath) 
@@ -333,10 +303,6 @@ public class DocumentIndexService
         return await SaveOrUpdateDocumentAsync(record);
     }
 
-    /// <summary>
-    /// Ejecuta una búsqueda rápida mediante FTS5 sobre el nombre y contenido de los documentos indexados.
-    /// Retorna resultados ordenados por relevancia (bm25) con fragmentos de texto resaltados.
-    /// </summary>
     public async Task<List<SearchResultItem>> SearchAsync(string query, int limit = 50)
     {
         var results = new List<SearchResultItem>();
@@ -345,7 +311,6 @@ public class DocumentIndexService
 
         await EnsureDatabaseCreatedAsync();
 
-        // Preparar término para FTS5 (eliminar comillas sueltas o caracteres especiales para evitar errores de sintaxis)
         string sanitizedQuery = query.Trim().Replace("\"", "\"\"");
         string matchExpression = $"\"{sanitizedQuery}\"*";
 
@@ -393,7 +358,6 @@ public class DocumentIndexService
         }
         catch
         {
-            // Fallback en caso de sintaxis FTS5 compleja
         }
         finally
         {
@@ -403,9 +367,6 @@ public class DocumentIndexService
         return results;
     }
 
-    /// <summary>
-    /// Retorna todas las raíces actualmente registradas en IndexRoots.
-    /// </summary>
     public async Task<List<IndexRootRecord>> GetAllRootsAsync()
     {
         await EnsureDatabaseCreatedAsync();
@@ -441,9 +402,6 @@ public class DocumentIndexService
         return roots;
     }
 
-    /// <summary>
-    /// Retorna la cantidad total de documentos indexados en Documents.
-    /// </summary>
     public async Task<int> GetIndexedCountAsync()
     {
         await EnsureDatabaseCreatedAsync();
@@ -465,9 +423,6 @@ public class DocumentIndexService
         }
     }
 
-    /// <summary>
-    /// Recupera todos los documentos indexados desde la base de datos SQLite para hidratar la interfaz de usuario.
-    /// </summary>
     public async Task<List<ProcessedDocumentResult>> GetAllIndexedResultsFromDbAsync()
     {
         await EnsureDatabaseCreatedAsync();

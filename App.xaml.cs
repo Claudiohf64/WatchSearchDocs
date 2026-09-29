@@ -9,7 +9,6 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Manejo de ejecución en modo asistente elevado (UAC) para leer carpetas protegidas
         if (e.Args.Length >= 4 && e.Args[0] == "--scan-elevated")
         {
             string targetFolder = e.Args[1];

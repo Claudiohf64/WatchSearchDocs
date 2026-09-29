@@ -30,25 +30,21 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Distintivo Tipo: [Raíz], [Subcarpeta], [Restringido] sin emojis -->
                     <Border Grid.Column="0" Background="#F1F5F9" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                         <TextBlock Text="{Binding TypeLabel}" 
                                    FontWeight="Bold" FontSize="11" 
                                    Foreground="{Binding FolderColor}"/>
                     </Border>
 
-                    <!-- Nombre de la carpeta -->
                     <TextBlock Grid.Column="1" Text="{Binding Name}" 
                                FontWeight="SemiBold" FontSize="13" 
                                Foreground="{Binding FolderColor}"
                                VerticalAlignment="Center" Margin="0,0,10,0"/>
 
-                    <!-- Ruta relativa informativa -->
-                    <TextBlock Grid.Column="2" Text="{Binding RelativePath, StringFormat='({0})'}" 
-                               FontSize="11" Foreground="#94A3B8" 
+                    <TextBlock Grid.Column="2" Text="{Binding RelativePath}" 
+                               FontSize="11" Foreground="#64748B" 
                                VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
 
-                    <!-- Conteo de archivos indexables -->
                     <Border Grid.Column="3" Background="#F8FAFC" CornerRadius="10" Padding="8,2" BorderBrush="#E2E8F0" BorderThickness="1" Margin="6,0,4,0">
                         <TextBlock Text="{Binding FileCountDisplay}" 
                                    FontSize="11" FontWeight="SemiBold" Foreground="#475569"/>
@@ -57,7 +53,6 @@
             </Expander.Header>
 
             <StackPanel Margin="16,6,8,8">
-                <!-- Tabla de archivos clasificados directos de esta carpeta -->
                 <ListView ItemsSource="{Binding FilteredFiles}" 
                           BorderThickness="0" 
                           Background="Transparent"
@@ -87,11 +82,9 @@
                             <GridViewColumn Header="Tipo" Width="55" DisplayMemberBinding="{Binding Extension}"/>
                             <GridViewColumn Header="Nombre del Archivo" Width="200" DisplayMemberBinding="{Binding Name}"/>
                             
-                            <!-- Columnas con información provista por el clasificador -->
                             <GridViewColumn Header="Categoría" Width="140" DisplayMemberBinding="{Binding CategoryName}"/>
                             <GridViewColumn Header="Procesador Asignado" Width="130" DisplayMemberBinding="{Binding ProcessorTarget}"/>
                             
-                            <!-- Columnas de ubicación de carpeta -->
                             <GridViewColumn Header="Carpeta" Width="130" DisplayMemberBinding="{Binding FolderName}"/>
                             <GridViewColumn Header="Tipo de Carpeta" Width="100" DisplayMemberBinding="{Binding FolderType}"/>
                             
@@ -113,7 +106,6 @@
                     </ListView.View>
                 </ListView>
 
-                <!-- Sub-desplegables recursivos para las subcarpetas -->
                 <ItemsControl ItemsSource="{Binding Subfolders}" Margin="0,4,0,0">
                     <ItemsControl.Style>
                         <Style TargetType="ItemsControl">
