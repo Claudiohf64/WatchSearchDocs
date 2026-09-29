@@ -104,6 +104,7 @@ public partial class MainWindow : Window
 
     private void ChkShowHidden_Changed(object sender, RoutedEventArgs e)
     {
+        if (!IsLoaded) return;
         ApplyFilter();
     }
 
@@ -660,6 +661,8 @@ public partial class MainWindow : Window
 
     private void UpdateSelectAllMasterState()
     {
+        if (ChkSelectAll == null || TxtSubfoldersSummary == null) return;
+
         var allNodes = GetAllNodesFlat(RootFolderNodes).ToList();
         int total = allNodes.Count;
         int selected = allNodes.Count(f => f.IsSelected);
@@ -686,6 +689,8 @@ public partial class MainWindow : Window
 
     private void ApplyFilter()
     {
+        if (TxtCount == null || TxtEmptyNotice == null) return;
+
         bool showHidden = ChkShowHidden?.IsChecked == true;
 
         int totalVisibleFiles = 0;
