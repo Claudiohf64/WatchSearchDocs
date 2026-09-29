@@ -30,6 +30,39 @@ public partial class MainWindow : Window
         InitializeComponent();
         IcRootFolders.ItemsSource = RootFolderNodes;
         TvSubfolders.ItemsSource = RootFolderNodes;
+        Loaded += MainWindow_Loaded;
+    }
+
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await DocumentIndexService.Instance.EnsureDatabaseCreatedAsync();
+
+            // Cargar resultados previamente indexados en SQLite para que se reflejen en la interfaz
+            var savedResults = await DocumentIndexService.Instance.GetAllIndexedResultsFromDbAsync();
+            _indexedResults.Clear();
+            _indexedResults.AddRange(savedResults);
+
+            // Si hay carpetas guardadas en IndexRoots y no se han seleccionado carpetas aún, restaurarlas
+            var savedRoots = await DocumentIndexService.Instance.GetAllRootsAsync();
+            if (savedRoots.Count > 0 && _rootFolderPaths.Count == 0)
+            {
+                var validRoots = savedRoots.Where(r => r.IsActive).Select(r => r.RootPath).Where(Directory.Exists).ToList();
+                if (validRoots.Count > 0)
+                {
+                    _rootFolderPaths.AddRange(validRoots);
+                    UpdateFolderPathTextBox();
+                    await LoadAllRootsAsync();
+                }
+            }
+
+            if (_indexedResults.Count > 0)
+            {
+                TxtStatus.Text = $"Base de datos SQLite activa: {_indexedResults.Count} archivo(s) indexados previamente.";
+            }
+        }
+        catch { }
     }
 
     private async void BtnSelectFolders_Click(object sender, RoutedEventArgs e)
@@ -46,6 +79,12 @@ public partial class MainWindow : Window
         {
             _rootFolderPaths.Clear();
             _rootFolderPaths.AddRange(dialog.FolderNames);
+
+            foreach (var folder in dialog.FolderNames)
+            {
+                try { await DocumentIndexService.Instance.GetOrCreateRootAsync(folder); } catch { }
+            }
+
             UpdateFolderPathTextBox();
             await LoadAllRootsAsync();
         }
@@ -68,6 +107,7 @@ public partial class MainWindow : Window
                 if (!_rootFolderPaths.Contains(path, StringComparer.OrdinalIgnoreCase))
                 {
                     _rootFolderPaths.Add(path);
+                    try { await DocumentIndexService.Instance.GetOrCreateRootAsync(path); } catch { }
                 }
             }
             UpdateFolderPathTextBox();
@@ -205,6 +245,13 @@ public partial class MainWindow : Window
                 // Guardar en la colección global de resultados indexados
                 _indexedResults.RemoveAll(r => r.FullPath.Equals(file.FullPath, StringComparison.OrdinalIgnoreCase));
                 _indexedResults.Add(result);
+
+                // Persistir en SQLite (tabla Documents y sincronización automática con DocumentsFTS)
+                try
+                {
+                    await DocumentIndexService.Instance.IndexProcessedResultAsync(file, result);
+                }
+                catch { }
 
                 // Actualizar el estado del archivo en la tabla de carpetas
                 file.IndexingStatus = result.Success ? "Indexado" : "Error";
@@ -626,6 +673,7 @@ public partial class MainWindow : Window
                     LastModified = file.LastWriteTime,
                     LastModifiedFormatted = file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     FullPath = file.FullName,
+                    RootPath = rootPath,
                     IsHidden = isHidden,
                     IsLocked = isLocked,
                     IsIndexable = classification.IsIndexable,
